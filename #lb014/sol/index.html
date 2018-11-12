@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Лабораторная последняя</title>
+	<style>
+		canvas{ display: block; background: #eee;}
+	</style>
+</head>
+<body>
+	<p>	X: <input value='100' type='text' id='x'/>
+		Y: <input value='100' type='text' id='y'/>
+		Файл: <input type='file' accept='text/txt' id='myfile'/></p>
+		<hr/>
+	<p>	X: <input value='100' type='text' id='xt'/>
+	Y: <input value='100' type='text' id='yt'/>
+	Текст: <input value='Text' type='text' id='mytext'/>
+	Повторы: <input value='1' type='text' id='repeat'/>
+	Шаг: <input value='1' type='text' id='step'/>
+	<button onclick="printText()">Вывести текст</button></p>
+	<hr/>
+	<select id='dir'>
+		<option value='x'>x</option>
+		<option value='y'>y</option>
+		<option selected value='z'>both</option>
+	</select>
+	<hr/>
+	<canvas id='field' width='500' height='500'></canvas>
+	<script>
+		var canvas = document.getElementById('field');
+
+		if (window.File && window.FileReader && window.FileList && window.Blob){
+			
+			var fileSelected = document.getElementById('myfile');
+			fileSelected.addEventListener('change', function (e) { 
+				//Set the extension for the file 
+				var fileExtension = /text.*/; 
+				//Get the file object 
+				var fileTobeRead = fileSelected.files[0];
+				//Check of the extension match 
+				if (fileTobeRead.type.match(fileExtension)) { 
+					//Initialize the FileReader object to read the 2file 
+					var fileReader = new FileReader(); 
+					fileReader.onload = function (e) { 
+						if (canvas.getContext){
+							var ctx = canvas.getContext('2d');
+							var sx = Number(document.getElementById('x').value);
+							var sy = Number(document.getElementById('y').value);
+							var lines = fileReader.result.split('\n');
+							var xy = [];
+							var x, y;
+							ctx.beginPath();
+							ctx.moveTo(sx, sy);
+							for (var i = 0; i < lines.length; i++){
+								x = Number(lines[i].split(' ')[0]);
+								y = Number(lines[i].split(' ')[1]);
+								console.log(x+sx, y+sy)
+								ctx.lineTo(x+sx,y+sy);
+							}
+							ctx.stroke();
+							ctx.closePath();
+						}
+					} 
+					fileReader.readAsText(fileTobeRead); 
+				} 
+					else { 
+						alert("Please select text file"); 
+					}
+			
+				}, false);
+				}
+		else {
+			alert('This browser does not support File API');
+		}
+
+		function printText(){
+			var ctx = canvas.getContext('2d');
+			ctx.font = "30pt Arial";
+			var x = +document.getElementById('xt').value;
+			var y = +document.getElementById('yt').value;
+			var n = document.getElementById('repeat').value;
+			var step = +document.getElementById('step').value;
+			for (var i = 0; i < n; i++){
+				if (document.getElementById('dir').selectedOptions[0].value == 'x'){
+					ctx.fillText(document.getElementById('mytext').value, x+i*step, y);
+				}
+				else if (document.getElementById('dir').selectedOptions[0].value == 'y'){
+					ctx.fillText(document.getElementById('mytext').value, x, y+i*step);
+				}
+				else {
+					ctx.fillText(document.getElementById('mytext').value, x+i*step, y+i*step);
+				}
+			}
+		}
+	</script>
+</body>
+</html>
